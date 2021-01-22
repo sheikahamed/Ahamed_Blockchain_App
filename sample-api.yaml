@@ -1,0 +1,349 @@
+---
+openapi: 3.0.2
+info:
+  title: order
+  version: 1.0.0
+  description: "Ingram Content Group Order API allow the users \n - To place a single\
+    \ order\n - To place bulk orders\n - To query an already places order\n - To cancel\
+    \ an order"
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Order Management Team
+    url: http://www.ingramcontent.com
+    email: oms-support@ingramcontent.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+- url: "http://{domain}:{port}/api/{version}"
+  description: ""
+  variables:
+    domain:
+      default: localhost
+    port:
+      default: "9005"
+    version:
+      default: v1
+paths:
+  /orders:
+    summary: Path used to manage the list of orders.
+    description: "The REST endpoint/path used to list and create zero or more `order`\
+      \ entities.  This path contains a `GET` and `POST` operation to perform the\
+      \ list and create tasks, respectively."
+    get:
+      parameters:
+      - examples:
+          billTo:
+            value: 20R1234
+        name: billTo
+        description: Customer billTo Identifier
+        schema:
+          type: string
+        in: query
+      - examples:
+          shipTo:
+            value: 20W1234
+        name: shipTo
+        description: Customer ship to Identifier
+        schema:
+          type: string
+        in: query
+      - examples:
+          createDate:
+            value: 2021-01-21
+        name: createdStartDate
+        description: Create date of an order in YYYY-MM-DD format.
+        schema:
+          type: string
+        in: query
+        required: false
+      - examples:
+          status:
+            value: New
+        name: status
+        description: Status of the order
+        schema:
+          type: string
+        in: query
+      - examples:
+          createdEndDate:
+            value: 2021-01-30
+        name: createdEndDate
+        description: Order create end date range in YYYY-MM-DD format
+        schema:
+          type: string
+        in: query
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/order'
+              examples:
+                orders-json:
+                  value:
+                  - createDate: 2021-01-19
+                    billTo: 20R1234
+                    shipTo: 20W1234
+                    orderLines:
+                      orderLine:
+                        backOrderInd: "true"
+                        orderLineId: "1234214"
+                        productId: "9788983922564"
+                        quantity: "10"
+                        status: NEW
+                  - createDate: 2021-01-19
+                    billTo: 20R1235
+                    shipTo: 20W1235
+                    orderLines:
+                      orderLine:
+                        backOrderInd: "false"
+                        orderLineId: "123422"
+                        productId: "9788983922563"
+                        quantity: "1"
+                        status: INPROCESS
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/order'
+              examples:
+                order-xml:
+                  value: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<orders>\r\
+                    \n   <order>\r\n      <billTo>20R1234</billTo>\r\n      <createDate>2021-01-19</createDate>\r\
+                    \n      <orderLines>\r\n         <orderLine>\r\n            <element>\r\
+                    \n               <backOrderInd>true</backOrderInd>\r\n       \
+                    \        <orderLineId>1234214</orderLineId>\r\n              \
+                    \ <productId>9788983922564</productId>\r\n               <quantity>10</quantity>\r\
+                    \n               <status>NEW</status>\r\n            </element>\r\
+                    \n         </orderLine>\r\n      </orderLines>\r\n      <shipTo>20W1234</shipTo>\r\
+                    \n   </order>\r\n   <order>\r\n      <billTo>20R1235</billTo>\r\
+                    \n      <createDate>2021-01-19</createDate>\r\n      <orderLines>\r\
+                    \n         <orderLine>\r\n            <element>\r\n          \
+                    \     <backOrderInd>false</backOrderInd>\r\n               <orderLineId>123422</orderLineId>\r\
+                    \n               <productId>9788983922563</productId>\r\n    \
+                    \           <quantity>1</quantity>\r\n               <status>INPROCESS</status>\r\
+                    \n            </element>\r\n         </orderLine>\r\n      </orderLines>\r\
+                    \n      <shipTo>20W1235</shipTo>\r\n   </order>\r\n</orders>"
+          description: Successful response - returns an array of `order` entities.
+      security:
+      - apikey: []
+      operationId: getorders
+      summary: List All orders
+      description: Gets a list of all `order` entities.
+    post:
+      requestBody:
+        description: A new `order` to be created.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/order'
+        required: true
+      responses:
+        "201":
+          description: Successful response.
+      security:
+      - apikey: []
+      operationId: createorder
+      summary: Create an order
+      description: Creates a new instance of an `order`.
+  /orders/{orderId}:
+    summary: Path used to manage a single order.
+    description: "The REST endpoint/path used to get, update, and delete single instances\
+      \ of an `order`.  This path contains `GET`, `PUT`, and `DELETE` operations used\
+      \ to perform the get, update, and delete tasks, respectively."
+    get:
+      parameters:
+      - examples:
+          orderId:
+            value: PO12345678
+        name: orderId
+        description: A unique identifier for a `order`.
+        schema:
+          type: string
+        in: path
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/order'
+              examples:
+                orders-json:
+                  value: " {    \"orderId\": \"PO123456\",\r\n      \"createDate\"\
+                    :\"2021-01-19\",\r\n      \"billTo\":\"20R1234\",\r\n      \"\
+                    shipTo\":\"20W1234\",\r\n      \"orderLines\":{\r\n         \"\
+                    orderLine\":{\r\n               \"backOrderInd\":\"true\",\r\n\
+                    \               \"orderLineId\":\"1234214\",\r\n             \
+                    \  \"productId\":\"9788983922564\",\r\n               \"quantity\"\
+                    :\"10\",\r\n               \"status\":\"INPROCESS\"\r\n      \
+                    \   }\r\n      }\r\n }"
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/order'
+              examples:
+                order-xml:
+                  value: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<order>\r\n\
+                    \   <billTo>20R1234</billTo>\r\n   <createDate>2021-01-19</createDate>\r\
+                    \n   <orderId>PO123456</orderId>\r\n   <orderLines>\r\n      <orderLine>\r\
+                    \n         <backOrderInd>true</backOrderInd>\r\n         <orderLineId>1234214</orderLineId>\r\
+                    \n         <productId>9788983922564</productId>\r\n         <quantity>10</quantity>\r\
+                    \n         <status>INPROCESS</status>\r\n      </orderLine>\r\n\
+                    \   </orderLines>\r\n   <shipTo>20W1234</shipTo>\r\n</order>"
+          description: Successful response - returns a single `order`.
+      security:
+      - apikey: []
+      operationId: getorder
+      summary: Get an order
+      description: Gets the details of a single instance of an `order`.
+    put:
+      requestBody:
+        description: Updated `order` information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/order'
+            examples:
+              orders-json:
+                value:
+                  orderId: PO123456
+                  createDate: 2021-01-19
+                  billTo: 20R1234
+                  shipTo: 20W1234
+                  orderLines:
+                    orderLine:
+                      backOrderInd: "true"
+                      orderLineId: "1234214"
+                      productId: "9788983922564"
+                      quantity: "1"
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/order'
+            examples:
+              order-xml:
+                value: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<order>\r\n\
+                  \   <billTo>20R1234</billTo>\r\n   <createDate>2021-01-19</createDate>\r\
+                  \n   <orderId>PO123456</orderId>\r\n   <orderLines>\r\n      <orderLine>\r\
+                  \n         <backOrderInd>true</backOrderInd>\r\n         <orderLineId>1234214</orderLineId>\r\
+                  \n         <productId>9788983922564</productId>\r\n         <quantity>1</quantity>\r\
+                  \n      </orderLine>\r\n   </orderLines>\r\n   <shipTo>20W1234</shipTo>\r\
+                  \n</order>"
+        required: true
+      parameters:
+      - examples:
+          orderId:
+            value: PO123456
+        name: orderId
+        description: A unique identifier for a `order`.
+        schema:
+          type: string
+        in: path
+        required: true
+      responses:
+        "202":
+          description: Successful response.
+      operationId: updateorder
+      summary: Update an order
+      description: Updates an existing `order`.
+    parameters:
+    - name: orderId
+      description: A unique identifier for a `order`.
+      schema:
+        type: string
+      in: path
+      required: true
+  /orders/{orderId}/cancel:
+    summary: Cancel an already placed order
+    description: Cancel order by passing orderId.
+    post:
+      responses:
+        "200":
+          description: Purchase Order Id 'PO123456' cancelled successfully.
+        "404":
+          description: Order not found with orderId <<orderId>>
+        "406":
+          description: Order cannot be cancelled with the current order status. Please
+            contact customer support at oms-support@ingramcontent.com
+      security:
+      - apikey: []
+      operationId: cancelOrder
+      summary: cancel an order
+      description: Cancel an alreay placed order.
+    parameters:
+    - examples:
+        orderId:
+          value: '"PO12435"'
+      name: orderId
+      description: OrderId
+      schema:
+        type: string
+      in: path
+      required: true
+components:
+  schemas:
+    orderLines:
+      description: Order line details
+      required:
+      - orderLineId
+      - productId
+      - quantity
+      type: object
+      properties:
+        orderLineId:
+          description: Order line Id
+          type: string
+        productId:
+          format: int64
+          description: ISBN-13 product identifier code
+          type: integer
+        quantity:
+          format: int32
+          description: product quantity
+          type: integer
+        status:
+          description: status of the order
+          enum:
+          - NEW
+          - INPROCESS
+          - SHIPPED
+          - CANCELLED
+          type: string
+    order:
+      required:
+      - createDate
+      - billTo
+      - shipTo
+      - orderLines
+      type: object
+      properties:
+        createDate:
+          description: Order creation date time
+          type: string
+        billTo:
+          description: Customer Bill to identifier
+          type: string
+        shipTo:
+          description: Ship to customer Id. It can be the same Bill To customer Id
+            or it can be a different customer Id for shipping.
+          type: string
+        orderLines:
+          description: Order lines.
+          type: array
+          items:
+            $ref: '#/components/schemas/orderLines'
+  securitySchemes:
+    apikey:
+      type: apiKey
+      description: API requires a token to be passed for authentication.
+      name: key
+      in: header
+security:
+- apikey: []
+tags:
+- name: order
+  description: ""
